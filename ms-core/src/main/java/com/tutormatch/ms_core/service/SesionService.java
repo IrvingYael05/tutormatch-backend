@@ -196,7 +196,26 @@ public class SesionService {
     }
 
     // =========================================================================
-    // Métodos auxiliares: Entity → DTO
+    // HU-Historial (Epica 5): Sesiones pasadas del tutor
+    // =========================================================================
+
+    /**
+     * Devuelve el historial de sesiones pasadas de un tutor, ordenadas de más reciente a más antigua.
+     *
+     * @param tutorId UUID del tutor extraído del JWT por el controlador
+     * @return        Lista de DTOs de sesiones pasadas del tutor
+     */
+    @Transactional(readOnly = true)
+    public List<SesionResponseDto> obtenerHistorial(UUID tutorId) {
+        return sesionRepository.findByTutorIdAndFechaHoraBefore(tutorId, LocalDateTime.now())
+            .stream()
+            .sorted((a, b) -> b.getFechaHora().compareTo(a.getFechaHora()))
+            .map(this::mapToResponseDto)
+            .collect(Collectors.toList());
+    }
+
+    // =========================================================================
+    // Métodos auxiliares: Entity -> DTO
     // =========================================================================
 
     public SesionResponseDto mapToResponseDto(Sesion sesion) {
@@ -233,7 +252,7 @@ public class SesionService {
             sesion.getCupoMaximo(),
             sesion.getCupoDisponible(),
             inscritos,
-            null   // calificación → null hasta que EP-05 lo implemente
+            null   // calificación -> null hasta que EP-05 lo implemente
         );
     }
 

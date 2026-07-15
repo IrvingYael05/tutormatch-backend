@@ -115,6 +115,31 @@ public class SesionController {
     }
 
     // -----------------------------------------------------------------------
+    // HU-Historial (Epica 5): GET — Historial de sesiones pasadas del tutor
+    // -----------------------------------------------------------------------
+
+    /**
+     * GET /api/core/sesiones-tutorias/historial
+     *
+     * Devuelve el historial de sesiones pasadas del tutor logueado,
+     * ordenadas de más reciente a más antigua.
+     *
+     * Seguridad: Solo usuarios con rol ROLE_TUTOR pueden llamar este endpoint.
+     * El tutorId se extrae automáticamente del token JWT (claim "usuario_id").
+     *
+     * @param jwt Token JWT inyectado automáticamente por Spring Security
+     * @return    200 OK con la lista de sesiones pasadas del tutor
+     */
+    @GetMapping("/historial")
+    @PreAuthorize("hasRole('ROLE_TUTOR')")
+    public ResponseEntity<List<SesionResponseDto>> obtenerHistorial(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        UUID tutorId = UUID.fromString(jwt.getClaimAsString("usuario_id"));
+        return ResponseEntity.ok(sesionService.obtenerHistorial(tutorId));
+    }
+
+    // -----------------------------------------------------------------------
     // Manejo de errores
     // -----------------------------------------------------------------------
 

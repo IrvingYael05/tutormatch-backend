@@ -45,4 +45,14 @@ public interface SesionRepository extends JpaRepository<Sesion, UUID> {
             @Param("materia") String materia,
             @Param("tutor") String tutor,
             @Param("fecha") LocalDate fecha);
+
+    /**
+     * HU-Historial: Busca todas las sesiones pasadas de un tutor específico.
+     * Util para el historial de tutorias (Epica 5).
+     *
+     * @param tutorId ID del tutor extraido del JWT
+     * @param fecha   Momento de referencia (normalmente LocalDateTime.now())
+     * @return Lista de sesiones del tutor con fechaHora anterior a 'fecha'
+     */
+    List<Sesion> findByTutorIdAndFechaHoraBefore(UUID tutorId, LocalDateTime fecha);
 }
