@@ -55,4 +55,15 @@ public interface SesionRepository extends JpaRepository<Sesion, UUID> {
      * @return Lista de sesiones del tutor con fechaHora anterior a 'fecha'
      */
     List<Sesion> findByTutorIdAndFechaHoraBefore(UUID tutorId, LocalDateTime fecha);
+
+    /**
+     * HU-Historial (Epica 5): Busca todas las sesiones concluidas de un usuario.
+     * Si es tutor, busca las que impartió. Si es alumno, busca a las que asistió.
+     *
+     * @param usuarioId ID del usuario (tutor o alumno)
+     * @param ahora     Fecha actual para filtrar sesiones pasadas
+     * @return Lista de sesiones concluidas
+     */
+    @Query("SELECT s FROM Sesion s WHERE (s.tutorId = :usuarioId OR s.id IN (SELECT i.sesionId FROM Inscripcion i WHERE i.alumnoId = :usuarioId AND i.estado = 'CONFIRMADA')) AND s.fechaHora < :ahora ORDER BY s.fechaHora DESC")
+    List<Sesion> findHistorialByUsuarioId(@Param("usuarioId") UUID usuarioId, @Param("ahora") LocalDateTime ahora);
 }

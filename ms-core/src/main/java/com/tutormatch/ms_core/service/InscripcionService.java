@@ -1,18 +1,19 @@
 package com.tutormatch.ms_core.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.tutormatch.ms_core.dto.AgendaAlumnoDto;
 import com.tutormatch.ms_core.dto.InscripcionRequestDto;
 import com.tutormatch.ms_core.entity.Inscripcion;
 import com.tutormatch.ms_core.entity.Sesion;
 import com.tutormatch.ms_core.repository.InscripcionRepository;
 import com.tutormatch.ms_core.repository.SesionRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class InscripcionService {
@@ -23,14 +24,11 @@ public class InscripcionService {
 
     private final InscripcionRepository inscripcionRepository;
     private final SesionRepository sesionRepository;
-    private final SesionService sesionService;
 
     public InscripcionService(InscripcionRepository inscripcionRepository,
-                              SesionRepository sesionRepository,
-                              SesionService sesionService) {
+                              SesionRepository sesionRepository) {
         this.inscripcionRepository = inscripcionRepository;
         this.sesionRepository = sesionRepository;
-        this.sesionService = sesionService;
     }
 
     // =========================================================================

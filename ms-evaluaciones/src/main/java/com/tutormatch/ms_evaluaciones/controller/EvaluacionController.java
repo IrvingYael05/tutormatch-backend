@@ -12,15 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-/**
- * Controlador REST para el módulo de Evaluaciones.
- *
- * Base path: /api/evaluaciones
- *
- * Endpoints:
- *  - POST /api/evaluaciones          → Registrar evaluación (solo ROLE_ALUMNO)
- *  - GET  /api/evaluaciones/promedio/{tutorId} → Obtener promedio de un tutor (cualquier autenticado)
- */
 @RestController
 @RequestMapping("/api/evaluaciones")
 public class EvaluacionController {
@@ -31,55 +22,37 @@ public class EvaluacionController {
         this.evaluacionService = evaluacionService;
     }
 
-    /**
-     * POST /api/evaluaciones
-     *
-     * HU-Evaluaciones: Permite que un Alumno registre una evaluación a un tutor
-     * después de una sesión de tutoría.
-     *
-     * Seguridad: Solo usuarios con rol ROLE_ALUMNO pueden llamar este endpoint.
-     * El alumnoId se extrae automáticamente del token JWT (claim "sub"),
-     * NO se recibe desde el body para evitar suplantación de identidad.
-     *
-     * @param dto  Body JSON con tutorId, sesionId, calificacion y comentario
-     * @param jwt  Token JWT inyectado automáticamente por Spring Security
-     * @return     201 Created con los datos de la evaluación registrada
-     */
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ALUMNO')")
-    public ResponseEntity<EvaluacionResponseDto> evaluarTutor(
+    public ResponseEntity<EvaluacionResponseDto> crearEvaluacion(
             @RequestBody EvaluacionRequestDto dto,
             @AuthenticationPrincipal Jwt jwt) {
-
-        // Extraemos el ID del alumno del JWT (claim "sub" contiene el UUID del usuario)
-        UUID alumnoId = UUID.fromString(jwt.getSubject());
-
-        EvaluacionResponseDto evaluacionCreada = evaluacionService.evaluarTutor(dto, alumnoId);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(evaluacionCreada);
+        UUID alumnoId;
+        try {
+            String userIdStr = jwt.getClaimAsString("usuario_id");
+            if (userIdStr == null) userIdStr = jwt.getSubject();
+            alumnoId = UUID.fromString(userIdStr);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Token inválido: No se puede extraer el ID del usuario.");
+        }
+        
+        EvaluacionResponseDto response = evaluacionService.crearEvaluacion(dto, alumnoId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /**
-     * GET /api/evaluaciones/promedio/{tutorId}
-     *
-     * Devuelve el promedio de calificaciones de un tutor.
-     * Accesible para cualquier usuario autenticado (alumnos, tutores, etc.).
-     *
-     * @param tutorId UUID del tutor a consultar
-     * @return        200 OK con el promedio como Double
-     */
     @GetMapping("/promedio/{tutorId}")
-    public ResponseEntity<Double> obtenerPromedio(@PathVariable UUID tutorId) {
-        Double promedio = evaluacionService.obtenerPromedioPorTutor(tutorId);
+    public ResponseEntity<Double> obtenerPromedioTutor(@PathVariable UUID tutorId) {
+        Double promedio = evaluacionService.obtenerPromedioTutor(tutorId);
         return ResponseEntity.ok(promedio);
     }
 
-    /**
-     * Manejo de errores de validación de negocio.
-     * Cuando el Service lanza IllegalArgumentException, devolvemos 400 Bad Request.
-     */
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleValidationError(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneralError(Exception ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error procesando la solicitud: " + ex.getMessage());
     }
 }

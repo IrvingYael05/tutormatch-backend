@@ -196,20 +196,19 @@ public class SesionService {
     }
 
     // =========================================================================
-    // HU-Historial (Epica 5): Sesiones pasadas del tutor
+    // HU-Historial (Epica 5): Sesiones pasadas del usuario
     // =========================================================================
 
     /**
-     * Devuelve el historial de sesiones pasadas de un tutor, ordenadas de más reciente a más antigua.
+     * Devuelve el historial de sesiones pasadas de un usuario (tutor o alumno).
      *
-     * @param tutorId UUID del tutor extraído del JWT por el controlador
-     * @return        Lista de DTOs de sesiones pasadas del tutor
+     * @param usuarioId UUID del usuario extraído del JWT
+     * @return          Lista de DTOs de sesiones pasadas del usuario
      */
     @Transactional(readOnly = true)
-    public List<SesionResponseDto> obtenerHistorial(UUID tutorId) {
-        return sesionRepository.findByTutorIdAndFechaHoraBefore(tutorId, LocalDateTime.now())
+    public List<SesionResponseDto> obtenerHistorial(UUID usuarioId) {
+        return sesionRepository.findHistorialByUsuarioId(usuarioId, LocalDateTime.now())
             .stream()
-            .sorted((a, b) -> b.getFechaHora().compareTo(a.getFechaHora()))
             .map(this::mapToResponseDto)
             .collect(Collectors.toList());
     }
