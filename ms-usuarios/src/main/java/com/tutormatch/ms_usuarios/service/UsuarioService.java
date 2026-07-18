@@ -149,6 +149,8 @@ public class UsuarioService {
 
         usuario.setEstadoSolicitud(ESTADO_RECHAZADO);
         usuarioRepository.save(usuario);
+    }
+
     // Obtener usuarios por ID
     public Usuario obtenerPorId(UUID id) {
         return usuarioRepository.findById(id)
