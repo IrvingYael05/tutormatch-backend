@@ -79,7 +79,7 @@ public class SesionController {
      * tutorId y tutorNombre se extraen del JWT (evita suplantación).
      */
     @PostMapping
-    @PreAuthorize("hasRole('TUTOR')")
+    @PreAuthorize("hasRole('ROLE_TUTOR')")
     public ResponseEntity<SesionResponseDto> publicarSesion(
             @RequestBody SesionRequestDto dto,
             @AuthenticationPrincipal Jwt jwt) {
@@ -102,7 +102,7 @@ public class SesionController {
     // -----------------------------------------------------------------------
 
     @GetMapping("/mi-agenda")
-    @PreAuthorize("hasRole('TUTOR')")
+    @PreAuthorize("hasRole('ROLE_TUTOR')")
     public ResponseEntity<List<SesionResponseDto>> obtenerMiAgenda(
             @AuthenticationPrincipal Jwt jwt) {
 
@@ -115,7 +115,7 @@ public class SesionController {
     // -----------------------------------------------------------------------
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('TUTOR')")
+    @PreAuthorize("hasRole('ROLE_TUTOR')")
     public ResponseEntity<SesionResponseDto> actualizarSesion(
             @PathVariable UUID id,
             @RequestBody SesionUpdateDto dto,
@@ -130,7 +130,7 @@ public class SesionController {
     // -----------------------------------------------------------------------
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('TUTOR')")
+    @PreAuthorize("hasRole('ROLE_TUTOR')")
     public ResponseEntity<Void> cancelarSesion(
             @PathVariable UUID id,
             @AuthenticationPrincipal Jwt jwt) {

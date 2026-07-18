@@ -42,7 +42,7 @@ public class InscripcionController {
      * El alumnoId se extrae del JWT, nunca del body.
      */
     @PostMapping
-    @PreAuthorize("hasRole('ALUMNO')")
+    @PreAuthorize("hasRole('ROLE_ALUMNO')")
     public ResponseEntity<Inscripcion> inscribirse(
             @RequestBody InscripcionRequestDto dto,
             @AuthenticationPrincipal Jwt jwt) {
@@ -63,7 +63,7 @@ public class InscripcionController {
      * Este endpoint SÍ revela el campo "lugar" (a diferencia del catálogo).
      */
     @GetMapping("/mi-agenda")
-    @PreAuthorize("hasRole('ALUMNO')")
+    @PreAuthorize("hasRole('ROLE_ALUMNO')")
     public ResponseEntity<List<AgendaAlumnoDto>> getMiAgendaAlumno(
             @AuthenticationPrincipal Jwt jwt) {
 
@@ -91,7 +91,7 @@ public class InscripcionController {
      * Incrementa el cupo de la sesión en 1.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ALUMNO')")
+    @PreAuthorize("hasRole('ROLE_ALUMNO')")
     public ResponseEntity<Void> cancelarInscripcion(
             @PathVariable UUID id,
             @AuthenticationPrincipal Jwt jwt) {
